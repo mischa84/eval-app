@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const { NODE_ENV, PORT, MONGODB_URI } = process.env;
 const isProd = NODE_ENV === "production";
-const port = PORT || 5000;
+const port = PORT ?? 5000;
 
 // Set up Mongoose
 mongoose
