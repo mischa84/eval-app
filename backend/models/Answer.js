@@ -13,14 +13,9 @@ const answerSchema = new mongoose.Schema({
 
 const AnswerSchema = new mongoose.Schema(
   {
-    author: {
+    questionnaire: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    formular: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Formular",
+      ref: "Questionnaire",
       required: true,
     },
     answers: [answerSchema],

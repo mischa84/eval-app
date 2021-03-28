@@ -35,6 +35,7 @@ app.use(cors());
 
 app.use("/api/register", require("./routes/api/register"));
 app.use("/api/login", require("./routes/api/login"));
+app.use("/api/questionnaire", require("./routes/api/questionnaire"));
 
 // Handle production
 if (isProd) {

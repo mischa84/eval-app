@@ -36,9 +36,9 @@ UserSchema.pre("save", async function (next) {
     }
   }
 });
-//TODO change to Promise
-UserSchema.methods.isValidPassword = function (newPassword) {
-  return bcrypt.compareSync(newPassword, this.password);
+
+UserSchema.methods.isValidPassword = async function (newPassword) {
+  return await bcrypt.compare(newPassword, this.password);
 };
 
 module.exports = mongoose.model("User", UserSchema);

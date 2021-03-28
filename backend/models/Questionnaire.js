@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const QuestionSchema = new mongoose.Schema({
-  title: {
+  question: {
     type: String,
     required: true,
   },
@@ -11,7 +11,7 @@ const QuestionSchema = new mongoose.Schema({
   },
 });
 
-const FormularSchema = new mongoose.Schema(
+const QuestionnaireSchema = new mongoose.Schema(
   {
     author: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,10 +19,12 @@ const FormularSchema = new mongoose.Schema(
       required: true,
     },
     questions: [QuestionSchema],
+    participants: { all: Boolean, groups: [String] },
+    visibility: { all: Boolean, groups: [String] },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Formular", FormularSchema);
+module.exports = mongoose.model("Questionnaire", QuestionnaireSchema);
