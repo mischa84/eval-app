@@ -5,7 +5,6 @@ const AuthHelper = require("../../helpers/AuthHelper");
 
 router.route("/").post(async (req, res) => {
   const { username, password, groups } = req.body;
-  //console.log(groups, typeof groups);
 
   // Validation
   if (!username) {

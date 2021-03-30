@@ -5,11 +5,14 @@ const Questionnaire = require("../../models/Questionnaire");
 const Answer = require("../../models/Answer");
 const ResHelper = require("../../helpers/ResHelper");
 const AuthHelper = require("../../helpers/AuthHelper");
-const Answer = require("../../models/Answer");
+
 
 router.route("/:id").post(async (req, res) => {
   try {
     questionnaire = await Questionnaire.findbyID(req.params.id);
+    if(!questionnaire){
+      return ResHelper.fail(res, "Questionnaire not found", 404);
+    }
     if (req.headers.authorization) {
       const payload = await AuthHelper.verifyToken(req.headers.authorization);
       const user = await User.findById(payload.userId);
@@ -45,8 +48,8 @@ router.route("/:id").post(async (req, res) => {
         "The value of an answer does not fit into the scale of the question"
       );
     }
-    const answer = new Answer({questionnaire: mongoose.Types.ObjectId(req.params.id), ...req.body});
-
+    const newAnswer = new Answer({questionnaire: mongoose.Types.ObjectId(req.params.id), ...req.body});
+    const answer = await newAnswer.save();
     return ResHelper.success(res, answer);
   } catch (err) {
     return ResHelper.error(res, err);
