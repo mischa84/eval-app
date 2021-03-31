@@ -11,7 +11,7 @@ router.route("/").post(async (req, res) => {
     return ResHelper.fail(res, "Username is required");
   }
   if (!password || !AuthHelper.validPassword(password)) {
-    return ResHelper.fail(res, "Passowrd must be at least 6 characters");
+    return ResHelper.fail(res, "Password must be at least 6 characters");
   }
   // Check user exists
   const users = User.find({ username });
@@ -23,12 +23,16 @@ router.route("/").post(async (req, res) => {
     const newUser = User({ username, password, groups });
     const savedUser = await newUser.save();
     const token = AuthHelper.createToken(savedUser);
-    ResHelper.success(res, {
-      message: "Registration successful!",
-      token,
-    });
-  } catch (error) {
-    ResHelper.error(res, error);
+    ResHelper.success(
+      res,
+      {
+        message: "Registration successful!",
+        token,
+      },
+      201
+    );
+  } catch (err) {
+    ResHelper.error(res, err);
   }
 });
 

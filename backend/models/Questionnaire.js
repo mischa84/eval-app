@@ -18,9 +18,16 @@ const QuestionnaireSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    title: { type: String, required: true },
     questions: [QuestionSchema],
-    participants: { all: Boolean, groups: [String] },
-    visibility: { all: Boolean, groups: [String] },
+    participants: {
+      all: { type: Boolean, default: false },
+      groups: { type: [String], default: [] },
+    },
+    visibility: {
+      all: { type: Boolean, default: false },
+      groups: { type: [String], default: [] },
+    },
   },
   {
     timestamps: true,

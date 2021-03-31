@@ -13,11 +13,28 @@ const server = require("../index");
 chai.use(chaiHttp);
 
 describe("Questionnaire", function () {
-  const questionnaire_1 = {
-    questions: [{ question: "How are you?", scale: 6 }],
+  const Q_all_all = {
+    title: "Feelings",
+    questions: [
+      { question: "How are you?", scale: 6 },
+      { question: "How tall are you?", scale: 200 },
+    ],
     participants: { all: true, groups: [] },
     visibility: { all: true, groups: [] },
   };
+  const answer_1 = [
+    { value: 1, comment: "" },
+    { value: 100, comment: "" },
+  ];
+  const answer_2 = [
+    { value: 2, comment: "" },
+    { value: 150, comment: "" },
+  ];
+  const answer_3 = [
+    { value: 3, comment: "" },
+    { value: 200, comment: "" },
+  ];
+
   function register(callback) {
     chai
       .request(server)
@@ -43,22 +60,31 @@ describe("Questionnaire", function () {
         });
     });
   }
-  function addAnswer(questionnaire, answers, callback) {
-    addQuestionnaire(questionnaire, (outerRes) => {
-      const id = outerRes.body.data._id;
-      chai
-        .request(server)
-        .post("/api/questionnaire/" + id)
-        .send({ answers })
-        .end((err, res) => {
-          callback(res);
-        });
+  function addAnswers(questionnaire, answers, callback) {
+    function add(qid, answers, res) {
+      if (answers.length) {
+        answer = answers.pop();
+        chai
+          .request(server)
+          .post("/api/questionnaire/" + qid)
+          .send({ answers: answer })
+          .end((err, res) => {
+            add(qid, answers, res);
+          });
+      } else {
+        callback(res, qid);
+      }
+    }
+    addQuestionnaire(questionnaire, (res) => {
+      const qid = res.body.data._id;
+      add(qid, answers, res);
     });
   }
 
   beforeEach(async function () {
     await User.deleteMany();
     await Questionnaire.deleteMany();
+    await Answer.deleteMany();
   });
 
   describe("Anonym", function () {
@@ -73,7 +99,7 @@ describe("Questionnaire", function () {
     });
 
     it("GET Questionnaire (one)", function (done) {
-      addQuestionnaire(questionnaire_1, () => {
+      addQuestionnaire(Q_all_all, () => {
         chai
           .request(server)
           .get("/api/questionnaire")
@@ -84,12 +110,12 @@ describe("Questionnaire", function () {
       });
     });
     it("POST Questionnaire Answer", function (done) {
-      addQuestionnaire(questionnaire_1, (outerRes) => {
+      addQuestionnaire(Q_all_all, (outerRes) => {
         const id = outerRes.body.data._id;
         chai
           .request(server)
           .post("/api/questionnaire/" + id)
-          .send({ answers: [{ value: 3, Comment: "" }] })
+          .send({ answers: answer_1 })
           .end((err, res) => {
             res.body.should.have.property("status").eql("success");
             done();
@@ -98,11 +124,10 @@ describe("Questionnaire", function () {
     });
 
     it("GET Questionnaire Answer", function (done) {
-      addAnswer(questionnaire_1, [{ value: 3, Comment: "" }], (outerRes) => {
-        const id = outerRes.body.data.questionnaire;
+      addAnswers(Q_all_all, [answer_1, answer_2, answer_3], (outerRes, qid) => {
         chai
           .request(server)
-          .get("/api/questionnaire/" + id)
+          .get("/api/questionnaire/" + qid)
           .end((err, res) => {
             res.body.should.have.property("status").eql("success");
             done();
